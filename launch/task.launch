@@ -1,0 +1,29 @@
+<launch>
+    <!-- ################### Arguments ###################-->
+    <arg name="add_gripper" default="true" />
+    <!-- pipeline is stomp or ompl -->
+    <arg name="pipeline" default="stomp" />
+    <!-- use_pathseed -->
+    <arg name="use_pathseed" default="true" />
+
+    <!-- ################### Parameters ###################-->
+    <!-- use_pathseed -->
+    <param name="use_pathseed" value="$(arg use_pathseed)" />
+    <!-- csv files -->
+    <param name="pipeline" value="$(arg pipeline)" />
+
+    <!-- ################### Launch ###################-->
+    <include file="$(find xarm_gazebo)/launch/xarm6_beside_table.launch">
+        <arg name="add_gripper" value="$(arg add_gripper)" />
+    </include>
+
+    <include file="$(find xarm6_gripper_moveit_config)/launch/xarm6_gripper_moveit_gazebo.launch" />
+
+    <!-- Planning Functionality -->
+    <include ns="move_group" file="$(find xarm6_gripper_moveit_config)/launch/planning_pipeline.launch.xml">
+        <arg name="pipeline" value="$(arg pipeline)" />
+    </include>
+
+    <!-- PathSeed publisher -->
+    <node name="pathseed_pub" pkg="train_data_smoothing" type="train_path_pub.py" output="screen"/>
+</launch>

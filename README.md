@@ -1,6 +1,17 @@
 # train_data_smoothing
 学習させた関節角度のデータをstompにPublishするパッケージ
 
+### インストール
+ワークスペースのsrc以下で
+```
+git clone https://github.com/Amos2610/train_data_smoothing.git
+```
+ビルドをする
+```
+catkin build
+source <your_ws>/devel/setup.bash
+```
+
 ### 実行環境
 + Ubuntu20.04LTS
 + ROS Noetic

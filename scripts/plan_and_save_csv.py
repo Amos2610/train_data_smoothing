@@ -139,12 +139,12 @@ class PlanAndSaveCSV:
         メイン関数
         """
         # 学習数
-        train_num = 100
+        train_num = 101
 
         start_row = input("Start row number: ")
         rospy.set_param('send_row', int(start_row))
 
-        for i in range(train_num - int(start_row)):
+        for i in range(train_num - int(start_row) + 1):
             if rospy.is_shutdown():
                 break
             # 保存する行数を取得

@@ -27,7 +27,7 @@ source <your_ws>/devel/setup.bash
     ├── csv_files ・・・関節データを含むcsvファイル
     │   └── after_train.csv
     ├── launch
-    │   └── task.launch ・・・ xArm6の起動を担う（各パラメータ，プランニングアルゴリズムの設定等できるようになっている）
+    │   └── xarm6_bringup.launch ・・・ xArm6の起動を担う（各パラメータ，プランニングアルゴリズムの設定等できるようになっている）
     ├── msg
     │   └── PathSeed.msg ・・・パスシードのトピック通信に必要なmsgファイル
     └── scripts
@@ -36,6 +36,7 @@ source <your_ws>/devel/setup.bash
         │   ├── random_sg.py ・・・ランダムなスタートとゴール姿勢を発生させるプログラム
         │   └── visualization.py ・・・T空間のeefの軌道の可視化
     >>> └── train_path_pub.py ・・・ 学習させた関節角度のデータをstompにPublishするファイル
+        └── plan_and_save_csv.py ・・・ xArm6のプランニングとパス修正後のパスをCSVへ保存するファイル
     ├── CMakeLists.txt 
     ├── package.xml
     └── README.md
@@ -44,12 +45,15 @@ source <your_ws>/devel/setup.bash
 1. ターミナルで以下のコマンドでGazeboとMoveIt!を立ち上げる
 
     ```
-    roslaunch train_data_smoothing task.launch
+    roslaunch train_data_smoothing xarm6_bringup.launch
     ```
 2. 関節角度のデータをstompへPublishする
    
     ```bash
     rosrun train_data_smoothing train_path_pub.py
     ```
-3. 手動もしくはxArm6を動かすようなscriptでxArm6を動かす
+3. xArm6をCSVデータに基づいてプランニングし，STOMPによりパスを修正し，新たなCSVへ保存する
    stompになっている，学習させたパスの通りになっていることを確認
+    ```bash
+    rosrun train_data_smoothing plan_and_save_csv.py
+    ```

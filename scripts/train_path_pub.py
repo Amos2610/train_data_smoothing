@@ -27,7 +27,7 @@ class TrainPathPublisher:
         self.filename = os.path.join(package_path, 'csv_files', 'after_train.csv')
 
         # Parameters
-        rospy.set_param('send_row', 0)
+        rospy.set_param('send_row', 1)
 
     def read_data_from_file(self, csv_file_path: str) -> np.ndarray:
         """
@@ -55,6 +55,10 @@ class TrainPathPublisher:
                     # rowはlist型
                     # すべての要素str型なので，float型に変換
                     row = [float(x) for x in row]
+                    # 最初の6つはスタート位置なので，パスシードからは除外
+                    row = row[6:]
+                    # 最後の6つはゴール位置なので，パスシードからは除外
+                    row = row[:-6]
                     all_data.append(row)
         except Exception as e:
             rospy.logerr("Failed to read file: %s. Error: %s", csv_file_path, str(e))
@@ -75,7 +79,7 @@ class TrainPathPublisher:
                 self.send_row = send_row
                 rospy.loginfo(f"Changed send_row to {self.send_row}")
                 data = self.read_data_from_file(self.filename)
-                data = data[self.send_row]
+                data = data[self.send_row-1]
                 num_rows = len(data) // NUM_COLS
             # flattened_data = data.flatten()
             matrix_msg = PathSeed()
@@ -85,6 +89,8 @@ class TrainPathPublisher:
             self.pub.publish(matrix_msg)
             self.count += 1
             rospy.loginfo(f"Finished publishing {self.send_row}th row. Count: {self.count}")
+            # 最初の1行のみデバッグとして出力
+            rospy.loginfo(f"row: {self.send_row}, data: {data[:NUM_COLS]}")
             self.rate.sleep()
 
 

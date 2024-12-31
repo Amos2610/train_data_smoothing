@@ -25,5 +25,6 @@
     </include>
 
     <!-- PathSeed publisher -->
-    <node name="pathseed_pub" pkg="train_data_smoothing" type="train_path_pub.py" output="screen"/>
+    <!-- TODO: launchファイルに記述するとうまく動作しないため、コメントアウトして別ターミナルで実行する -->
+    <!-- <node name="pathseed_pub" pkg="train_data_smoothing" type="train_path_pub.py" output="screen"/> -->
 </launch>

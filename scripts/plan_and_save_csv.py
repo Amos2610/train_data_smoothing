@@ -6,6 +6,8 @@ import csv
 import rospkg
 from moveit_commander import RobotCommander, MoveGroupCommander
 from moveit_msgs.msg import ExecuteTrajectoryActionGoal
+from tools.xarm6_air_cut import XArm6AirCut
+
 # 相対パス
 rospack = rospkg.RosPack()
 package_path = rospack.get_path('train_data_smoothing')  # パッケージ名を指定
@@ -17,12 +19,14 @@ class PlanAndSaveCSV:
         self.robot = RobotCommander()
         self.xarm = MoveGroupCommander("xarm6")
 
+        self.air_cut = XArm6AirCut()
+
         # メッセージの初期化
         self.msg = None
 
         # CSVファイルの読み込み csv_files/after_train.csv
         self.input_csv = os.path.join(package_path, "csv_files", "after_train.csv")
-        self.output_csv = 'output_after_smoothing.csv'
+        self.output_csv = 'output_after_smoothing3.csv'
 
         # Subscriber
         self.subscriber = rospy.Subscriber("/execute_trajectory/goal", ExecuteTrajectoryActionGoal, self.execute_trajectory_callback)
@@ -147,6 +151,7 @@ class PlanAndSaveCSV:
         for i in range(train_num - int(start_row) + 1):
             if rospy.is_shutdown():
                 break
+            rospy.set_param('use_pathseed', True)
             # 保存する行数を取得
             send_row = rospy.get_param('send_row', 0)
             print(f"========================= Send row: {send_row} =========================")
@@ -154,8 +159,11 @@ class PlanAndSaveCSV:
             # スタートとゴールの関節角度を取得
             start_joint_values, goal_joint_values = self.set_state_and_goal_joint_values(send_row)
             print(f"Start joint values: {start_joint_values}, \nGoal joint values: {goal_joint_values}")
-            # スタート位置に移動
-            self.planning(start_joint_values)
+            # rospy.set_param("use_pathseed", False)
+            # # スタート位置に移動
+            # self.planning(start_joint_values)
+            # rospy.set_param('use_pathseed', True)
+            self.air_cut.execute(start_joint_values)
             rospy.loginfo("Start position reached.")
             print("============== Planning to goal position ==============")
             # プランニング
